@@ -1,3 +1,5 @@
+import LetterState.*
+
 fun main(args: Array<String>) {
     println("Hello World!")
 
@@ -13,20 +15,25 @@ enum class LetterState {
 }
 
 fun wordle(realWord: String, guess: String): List<LetterState> {
-    val output = MutableList(realWord.length) { LetterState.INCORRECT }
+    val output = MutableList(realWord.length) { INCORRECT }
 
     val lettersInRealWord = realWord.toMutableList()
-    for(index in 0..realWord.lastIndex) {
-        if(realWord[index] == guess[index]) {
-            output[index] = LetterState.CORRECT
-            lettersInRealWord.remove(realWord[index])
+
+    for (index in output.indices) {
+        val guessLetter = guess[index]
+        val realLetter = realWord[index]
+        if (guessLetter == realLetter) {
+            output[index] = CORRECT
+            lettersInRealWord -= realLetter
         }
     }
-    for(index in 0..realWord.lastIndex) {
-        if(output[index] != LetterState.INCORRECT) continue
-        if(guess[index] in lettersInRealWord) {
-            output[index] = LetterState.WRONG_POSITION
-            lettersInRealWord.remove(guess[index])
+
+    for (index in output.indices) {
+        if (output[index] != INCORRECT) continue
+        val guessLetter = guess[index]
+        if (guessLetter in lettersInRealWord) {
+            output[index] = WRONG_POSITION
+            lettersInRealWord -= guessLetter
         }
     }
     return output
