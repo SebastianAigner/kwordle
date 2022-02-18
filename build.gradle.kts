@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.10"
-    application
+    id("org.jetbrains.compose") version "1.0.1-rc2"
 }
 
 group = "io.sebi"
@@ -10,10 +10,17 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 dependencies {
+    implementation(compose.desktop.currentOs)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    testImplementation("app.cash.turbine:turbine:0.7.0")
 }
 
 tasks.test {
@@ -24,6 +31,8 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-application {
-    mainClass.set("MainKt")
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+    }
 }
