@@ -1,6 +1,9 @@
-import LetterState.CORRECT
-import LetterState.INCORRECT
 import app.cash.turbine.test
+import io.sebi.kwordle.game.Game
+import io.sebi.kwordle.game.LetterState
+import io.sebi.kwordle.game.LetterState.*
+import io.sebi.kwordle.game.WordleLetter
+import io.sebi.kwordle.game.WordleWord
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.junit5.JUnit5Asserter.assertEquals
@@ -56,5 +59,19 @@ class GameTest {
                 expectMostRecentItem(),
             )
         }
+    }
+
+    @Test
+    fun `correctly returns best state for letter`() = runTest {
+        val g = Game("ABCDE")
+        g.guess("ACBXX")
+        assertEquals("A correctly positioned letter should be identified as such", CORRECT, g.bestGuessForLetter('A'))
+        assertEquals(
+            "An incorrectly positioned letter should be identified as such",
+            WRONG_POSITION,
+            g.bestGuessForLetter('B')
+        )
+        assertEquals("A non-existent letter should be identified as such", INCORRECT, g.bestGuessForLetter('X'))
+        assertEquals("An unguessed letter should be identified as such", UNGUESSED, g.bestGuessForLetter('Y'))
     }
 }

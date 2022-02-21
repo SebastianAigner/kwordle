@@ -1,4 +1,5 @@
-import LetterState.*
+package io.sebi.kwordle.ui
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
@@ -20,6 +21,10 @@ import androidx.compose.ui.unit.times
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import io.sebi.kwordle.game.Game
+import io.sebi.kwordle.game.LetterState
+import io.sebi.kwordle.game.LetterState.*
+import io.sebi.kwordle.game.WordleWord
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

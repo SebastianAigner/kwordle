@@ -1,4 +1,5 @@
-import LetterState.*
+import io.sebi.kwordle.game.LetterState.*
+import io.sebi.kwordle.game.wordle
 import org.junit.jupiter.api.Test
 import kotlin.test.junit5.JUnit5Asserter.assertEquals
 

@@ -1,4 +1,6 @@
-import LetterState.*
+package io.sebi.kwordle.game
+
+import io.sebi.kwordle.game.LetterState.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
