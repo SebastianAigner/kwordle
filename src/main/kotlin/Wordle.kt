@@ -6,16 +6,31 @@ import kotlinx.coroutines.flow.update
 enum class LetterState {
     CORRECT,
     INCORRECT,
-    WRONG_POSITION
+    WRONG_POSITION,
+    UNGUESSED
 }
 
-data class WordleWord(val word: String, val letterStates: List<LetterState>)
+data class WordleWord(val letters: List<WordleLetter>)
+data class WordleLetter(val letter: Char, val letterState: LetterState)
 
 class Game(val realWord: String) {
+    fun bestGuessForLetter(c: Char): LetterState {
+        val letterStates = guesses.value
+            .flatMap { it.letters }
+            .filter { it.letter == c }
+            .map { it.letterState }
+        if (letterStates.any { it == CORRECT }) return CORRECT
+        if (letterStates.any { it == WRONG_POSITION }) return WRONG_POSITION
+        if (letterStates.any { it == INCORRECT }) return INCORRECT
+        return UNGUESSED
+    }
+
     var guesses = MutableStateFlow(listOf<WordleWord>())
     fun guess(guess: String) {
+        val wordleWord =
+            guess.asIterable().zip(wordle(realWord, guess)) { letter, state -> WordleLetter(letter, state) }
         guesses.update {
-            it + WordleWord(guess, wordle(realWord, guess))
+            it + WordleWord(wordleWord)
         }
     }
 }

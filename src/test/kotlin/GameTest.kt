@@ -6,6 +6,13 @@ import org.junit.jupiter.api.Test
 import kotlin.test.junit5.JUnit5Asserter.assertEquals
 
 class GameTest {
+
+    fun wordleWordfromLettersAndStates(letters: String, state: List<LetterState>): WordleWord {
+        return WordleWord(letters.asIterable().zip(state) { letter, state ->
+            WordleLetter(letter, state)
+        })
+    }
+
     @Test
     fun `adds an all-wrong guess`() = runTest {
         val g = Game("AAAAA")
@@ -13,7 +20,7 @@ class GameTest {
         g.guesses.test {
             assertEquals(
                 "Most recent state should contain guess",
-                listOf(WordleWord("BBBBB", List(5) { INCORRECT })),
+                listOf(wordleWordfromLettersAndStates("BBBBB", List(5) { INCORRECT })),
                 expectMostRecentItem(),
             )
         }
@@ -28,8 +35,8 @@ class GameTest {
             assertEquals(
                 "Most recent state should contain all guesses",
                 listOf(
-                    WordleWord("BBBBB", List(5) { INCORRECT }),
-                    WordleWord("BBBBB", List(5) { INCORRECT }),
+                    wordleWordfromLettersAndStates("BBBBB", List(5) { INCORRECT }),
+                    wordleWordfromLettersAndStates("BBBBB", List(5) { INCORRECT }),
                 ),
                 expectMostRecentItem(),
             )
@@ -44,7 +51,7 @@ class GameTest {
             assertEquals(
                 "Most recent state should contain all guesses",
                 listOf(
-                    WordleWord("AAAAA", List(5) { CORRECT }),
+                    wordleWordfromLettersAndStates("AAAAA", List(5) { CORRECT }),
                 ),
                 expectMostRecentItem(),
             )
