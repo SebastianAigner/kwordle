@@ -115,7 +115,6 @@ fun Keyboard(g: Game, onKeyClicked: (Char) -> Unit) {
                     for (letter in row) {
                         val state = g.bestGuessForLetter(letter)
                         Crossfade(targetState = state) { state ->
-
                             Box(
                                 Modifier.clickable { onKeyClicked(letter) }.padding(1.dp).border(1.dp, White)
                                     .width(24.dp).height(32.dp)

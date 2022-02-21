@@ -1,6 +1,6 @@
+import LetterState.*
 import org.junit.jupiter.api.Test
 import kotlin.test.junit5.JUnit5Asserter.assertEquals
-import LetterState.*
 
 class WordleTest {
 
@@ -50,5 +50,14 @@ class WordleTest {
             "BOOBB"
         )
         assertEquals("", listOf(INCORRECT, CORRECT, INCORRECT, INCORRECT, INCORRECT), state)
+    }
+
+    @Test
+    fun `ignores capitalization`() {
+        val state = wordle(
+            "AaaaA",
+            "aaAaA"
+        )
+        assertEquals("", List(5) { CORRECT }, state)
     }
 }

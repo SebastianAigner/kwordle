@@ -1,6 +1,5 @@
 import LetterState.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 
 enum class LetterState {
@@ -27,27 +26,26 @@ class Game(val realWord: String) {
 
     var guesses = MutableStateFlow(listOf<WordleWord>())
     fun guess(guess: String) {
+        val normalizedGuess = guess.trim().uppercase()
         val wordleWord =
-            guess.asIterable().zip(wordle(realWord, guess)) { letter, state -> WordleLetter(letter, state) }
+            normalizedGuess.asIterable()
+                .zip(wordle(realWord, normalizedGuess)) { letter, state -> WordleLetter(letter, state) }
         guesses.update {
             it + WordleWord(wordleWord)
         }
     }
 }
 
-suspend fun main() {
-    val g = Game("foo")
-    g.guesses.take(1)
-}
-
 fun wordle(realWord: String, guess: String): List<LetterState> {
-    val output = MutableList(realWord.length) { INCORRECT }
+    val normalizedRealWord = realWord.uppercase()
+    val normalizedGuess = guess.uppercase()
+    val output = MutableList(normalizedRealWord.length) { INCORRECT }
 
-    val lettersInRealWord = realWord.toMutableList()
+    val lettersInRealWord = normalizedRealWord.toMutableList()
 
     for (index in output.indices) {
-        val guessLetter = guess[index]
-        val realLetter = realWord[index]
+        val guessLetter = normalizedGuess[index]
+        val realLetter = normalizedRealWord[index]
         if (guessLetter == realLetter) {
             output[index] = CORRECT
             lettersInRealWord -= realLetter
@@ -56,7 +54,7 @@ fun wordle(realWord: String, guess: String): List<LetterState> {
 
     for (index in output.indices) {
         if (output[index] != INCORRECT) continue
-        val guessLetter = guess[index]
+        val guessLetter = normalizedGuess[index]
         if (guessLetter in lettersInRealWord) {
             output[index] = WRONG_POSITION
             lettersInRealWord -= guessLetter
