@@ -5,33 +5,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 enum class LetterState {
-    CORRECT,
-    INCORRECT,
-    WRONG_POSITION,
-    UNGUESSED
+    CORRECT, WRONG_POSITION, INCORRECT, UNGUESSED
 }
 
 data class WordleWord(val letters: List<WordleLetter>)
 data class WordleLetter(val letter: Char, val letterState: LetterState)
 
 class Game(val realWord: String) {
-    fun bestGuessForLetter(c: Char): LetterState {
-        val letterStates = guesses.value
-            .flatMap { it.letters }
-            .filter { it.letter == c }
-            .map { it.letterState }
-        if (letterStates.any { it == CORRECT }) return CORRECT
-        if (letterStates.any { it == WRONG_POSITION }) return WRONG_POSITION
-        if (letterStates.any { it == INCORRECT }) return INCORRECT
-        return UNGUESSED
-    }
+    fun bestGuessForLetter(c: Char) =
+        guesses.value.flatMap { it.letters }.filter { it.letter == c }.map { it.letterState }.minByOrNull { it.ordinal }
+            ?: UNGUESSED
 
     var guesses = MutableStateFlow(listOf<WordleWord>())
+
     fun guess(guess: String) {
         val normalizedGuess = guess.trim().uppercase()
-        val wordleWord =
-            normalizedGuess.asIterable()
-                .zip(wordle(realWord, normalizedGuess)) { letter, state -> WordleLetter(letter, state) }
+        val wordleWord = normalizedGuess.asIterable()
+            .zip(wordle(realWord, normalizedGuess)) { letter, state -> WordleLetter(letter, state) }
         guesses.update {
             it + WordleWord(wordleWord)
         }

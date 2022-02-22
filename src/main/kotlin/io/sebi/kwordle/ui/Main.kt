@@ -36,7 +36,7 @@ val Shapes = Shapes(
 
 
 fun main() = application {
-    val wordleGame = Game("CRANE")
+    val wordleGame = Game("EEVEE")
     Window(
         onCloseRequest = ::exitApplication,
         title = "Kwordle for Desktop",
@@ -159,7 +159,6 @@ fun WordleLetterA() {
     WordleLetter(INCORRECT, 'A', 0)
 }
 
-@Preview
 @Composable
 fun WordleLetter(state: LetterState, letter: Char, index: Int) {
     var shouldBeVisible by remember { mutableStateOf(false) }

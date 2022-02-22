@@ -62,16 +62,50 @@ class GameTest {
     }
 
     @Test
-    fun `correctly returns best state for letter`() = runTest {
+    fun `correctly returns best state for correctly positioned letter`() = runTest {
         val g = Game("ABCDE")
         g.guess("ACBXX")
         assertEquals("A correctly positioned letter should be identified as such", CORRECT, g.bestGuessForLetter('A'))
+    }
+
+    @Test
+    fun `correctly returns best state for wrongly positioned letter`() = runTest {
+        val g = Game("ABCDE")
+        g.guess("ACBXX")
         assertEquals(
             "An incorrectly positioned letter should be identified as such",
             WRONG_POSITION,
             g.bestGuessForLetter('B')
         )
-        assertEquals("A non-existent letter should be identified as such", INCORRECT, g.bestGuessForLetter('X'))
+    }
+
+
+    @Test
+    fun `correctly returns best state for unguessed letter`() = runTest {
+        val g = Game("ABCDE")
+        g.guess("ACBXX")
         assertEquals("An unguessed letter should be identified as such", UNGUESSED, g.bestGuessForLetter('Y'))
     }
+
+    @Test
+    fun `correctly returns best state for incorrect letter`() {
+        val g = Game("ABCDE")
+        g.guess("ACBXX")
+        assertEquals("A non-existent letter should be identified as such", INCORRECT, g.bestGuessForLetter('X'))
+    }
+
+    @Test
+    fun `no guessed letters means all letters should be unguessed`() {
+        val g = Game("ABCDE")
+        assertEquals("A non-existent letter should be identified as such", UNGUESSED, g.bestGuessForLetter('X'))
+    }
+
+    @Test
+    fun `correctly returns best state for incorrect and unguessed letters`() {
+        val g = Game("ABCDE")
+        g.guess("XXXXX")
+        assertEquals("A non-existent letter should be identified as such", INCORRECT, g.bestGuessForLetter('X'))
+        assertEquals("A non-existent letter should be identified as such", UNGUESSED, g.bestGuessForLetter('Y'))
+    }
+
 }

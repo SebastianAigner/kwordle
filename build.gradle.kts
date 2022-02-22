@@ -34,6 +34,6 @@ tasks.withType<KotlinCompile> {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "io.sebi.kwordle.ui.MainKt"
     }
 }
