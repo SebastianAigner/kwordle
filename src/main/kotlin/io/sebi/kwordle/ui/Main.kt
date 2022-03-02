@@ -8,13 +8,18 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.isTypedEvent
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.times
@@ -36,14 +41,15 @@ val Shapes = Shapes(
 
 
 fun main() = application {
-    val wordleGame = Game("EEVEE")
+    val wordleGame = Game("CRANE")
     Window(
         onCloseRequest = ::exitApplication,
         title = "Kwordle for Desktop",
         state = rememberWindowState(width = 5 * 128.dp, height = 8 * 128.dp),
+
     ) {
         MaterialTheme(shapes = Shapes) {
-            Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
+            Column(Modifier.fillMaxSize().background(Color(0xFF121213)).padding(20.dp), Arrangement.spacedBy(5.dp)) {
                 WordleGame(wordleGame)
             }
         }
@@ -56,9 +62,17 @@ fun WordleGame(game: Game) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     var textFieldState by remember { mutableStateOf("") }
-    Column(Modifier.fillMaxSize()) {
-        WordInput(textFieldState, onChange = { textFieldState = it }) {
-            textFieldState = ""
+    Column(Modifier.fillMaxSize(), Arrangement.spacedBy(30.dp)) {
+//        WordInput(textFieldState, onChange = { textFieldState = it }) {
+//            textFieldState = ""
+//            game.guess(it)
+//            scope.launch {
+//                delay(100)
+//                scrollState.animateScrollTo(scrollState.maxValue)
+//            }
+//        }
+        Spacer(Modifier.height(10.dp))
+        WordleWordInput {
             game.guess(it)
             scope.launch {
                 delay(100)
@@ -94,7 +108,6 @@ fun ColoredWords(gameState: List<WordleWord>, scrollState: ScrollState) {
         }
     }
 }
-
 
 @Composable
 fun ColoredWord(w: WordleWord) {
@@ -152,6 +165,37 @@ val LetterState.textColor: Color
             else -> White
         }
     }
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun WordleWordInput(onWordSubmitted: (String) -> Unit) {
+    var wordInput by remember { mutableStateOf("") }
+    val requester = remember { FocusRequester() }
+    Box(Modifier.onKeyEvent { keyEvent ->
+        println(keyEvent)
+        when {
+            keyEvent.key == Key.Enter -> {
+                onWordSubmitted(wordInput)
+                wordInput = ""
+            }
+            keyEvent.key == Key.Backspace && keyEvent.type == KeyEventType.KeyUp -> {
+                wordInput = wordInput.dropLast(1)
+            }
+            keyEvent.isTypedEvent -> {
+                wordInput += keyEvent.utf16CodePoint.toChar()
+            }
+        }
+        wordInput = wordInput.take(5)
+        false
+    }
+        .focusRequester(requester)
+        .clickable { requester.requestFocus() }
+    ) {
+        ColoredWord(WordleWord(List(5) {
+            io.sebi.kwordle.game.WordleLetter(wordInput.getOrElse(it) { ' ' }.uppercaseChar(), INCORRECT)
+        }))
+    }
+}
 
 @Preview
 @Composable
