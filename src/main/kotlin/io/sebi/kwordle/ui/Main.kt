@@ -97,9 +97,22 @@ fun WordInputWithOnScreenKeyboard(game: Game, onWordSubmitted: (String) -> Unit)
         wordInput = wordInput.take(5)
         false
     }
-    Keyboard(game) {
-        wordInput += it
-        wordInput = wordInput.take(5)
+    Keyboard(game) { char ->
+        when (char) {
+            '⏎' -> {
+                onWordSubmitted(wordInput)
+                wordInput = ""
+            }
+
+            '⌫' -> {
+                wordInput = wordInput.dropLast(1)
+            }
+
+            else -> {
+                wordInput += char
+                wordInput = wordInput.take(5)
+            }
+        }
     }
 }
 
@@ -127,7 +140,7 @@ fun ColoredWord(w: WordleWord) {
 @Composable
 fun Keyboard(g: Game, onKeyClicked: (Char) -> Unit) {
     val keyboard = listOf(
-        "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"
+        "QWERTYUIOP", "ASDFGHJKL", "⏎ZXCVBNM⌫"
     )
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
