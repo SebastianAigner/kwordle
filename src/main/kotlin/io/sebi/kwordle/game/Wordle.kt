@@ -35,7 +35,7 @@ fun wordle(realWord: String, guess: String): List<LetterState> {
 
     val lettersInRealWord = normalizedRealWord.toMutableList()
 
-    for (index in output.indices) {
+    for (index in normalizedRealWord.indices intersect normalizedGuess.indices) {
         val guessLetter = normalizedGuess[index]
         val realLetter = normalizedRealWord[index]
         if (guessLetter == realLetter) {
@@ -46,7 +46,7 @@ fun wordle(realWord: String, guess: String): List<LetterState> {
 
     for (index in output.indices) {
         if (output[index] != INCORRECT) continue
-        val guessLetter = normalizedGuess[index]
+        val guessLetter = normalizedGuess.getOrNull(index) ?: continue
         if (guessLetter in lettersInRealWord) {
             output[index] = WRONG_POSITION
             lettersInRealWord -= guessLetter

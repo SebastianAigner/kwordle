@@ -8,11 +8,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.junit5.JUnit5Asserter.assertEquals
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class GameTest {
 
     fun wordleWordfromLettersAndStates(letters: String, state: List<LetterState>): WordleWord {
-        return WordleWord(letters.asIterable().zip(state) { letter, state ->
-            WordleLetter(letter, state)
+        return WordleWord(letters.asIterable().zip(state) { letter, letterState ->
+            WordleLetter(letter, letterState)
         })
     }
 
@@ -106,6 +107,20 @@ class GameTest {
         g.guess("XXXXX")
         assertEquals("A non-existent letter should be identified as such", INCORRECT, g.bestGuessForLetter('X'))
         assertEquals("A non-existent letter should be identified as such", UNGUESSED, g.bestGuessForLetter('Y'))
+    }
+
+    @Test
+    fun `accepts a guess that is too short`() {
+        val g = Game("ABCDE")
+        g.guess("ABC")
+        assertEquals("A guess that is too short should be accepted", 1, g.guesses.value.size)
+    }
+
+    @Test
+    fun `accepts a guess that is too long`() {
+        val g = Game("ABCDE")
+        g.guess("ABCDEFGH")
+        assertEquals("A guess that is too long should be accepted", 1, g.guesses.value.size)
     }
 
 }
