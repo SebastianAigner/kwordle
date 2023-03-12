@@ -47,7 +47,7 @@ fun main() = application {
         title = "Kwordle for Desktop",
         state = rememberWindowState(width = 5 * 128.dp, height = 8 * 128.dp),
 
-    ) {
+        ) {
         MaterialTheme(shapes = Shapes) {
             Column(Modifier.fillMaxSize().background(Color(0xFF121213)).padding(20.dp), Arrangement.spacedBy(5.dp)) {
                 WordleGame(wordleGame)
@@ -61,42 +61,45 @@ fun WordleGame(game: Game) {
     val gameState by game.guesses.collectAsState()
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
-    var textFieldState by remember { mutableStateOf("") }
     Column(Modifier.fillMaxSize(), Arrangement.spacedBy(30.dp)) {
-//        WordInput(textFieldState, onChange = { textFieldState = it }) {
-//            textFieldState = ""
-//            game.guess(it)
-//            scope.launch {
-//                delay(100)
-//                scrollState.animateScrollTo(scrollState.maxValue)
-//            }
-//        }
         Spacer(Modifier.height(10.dp))
-        WordleWordInput {
+        WordInputWithOnScreenKeyboard(game, onWordSubmitted = {
             game.guess(it)
             scope.launch {
                 delay(100)
                 scrollState.animateScrollTo(scrollState.maxValue)
             }
-        }
-        Keyboard(game) {
-            textFieldState += it
-        }
+        })
         ColoredWords(gameState, scrollState)
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun WordInput(textFieldState: String, onChange: (String) -> Unit, onSubmit: (String) -> Unit) {
-    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.Center) {
-        OutlinedTextField(textFieldState, modifier = Modifier.fillMaxWidth().weight(3f), onValueChange = {
-            onChange(it)
-        })
-        Button(modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f), onClick = {
-            onSubmit(textFieldState)
-        }) {
-            Text("Submit")
+fun WordInputWithOnScreenKeyboard(game: Game, onWordSubmitted: (String) -> Unit) {
+    var wordInput by remember { mutableStateOf("") }
+    WordleWordInput(wordInput) { keyEvent ->
+        println(keyEvent)
+        when {
+            keyEvent.key == Key.Enter -> {
+                onWordSubmitted(wordInput)
+                wordInput = ""
+            }
+
+            keyEvent.key == Key.Backspace && keyEvent.type == KeyEventType.KeyUp -> {
+                wordInput = wordInput.dropLast(1)
+            }
+
+            keyEvent.isTypedEvent -> {
+                wordInput += keyEvent.utf16CodePoint.toChar()
+            }
         }
+        wordInput = wordInput.take(5)
+        false
+    }
+    Keyboard(game) {
+        wordInput += it
+        wordInput = wordInput.take(5)
     }
 }
 
@@ -168,31 +171,14 @@ val LetterState.textColor: Color
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun WordleWordInput(onWordSubmitted: (String) -> Unit) {
-    var wordInput by remember { mutableStateOf("") }
+fun WordleWordInput(currentWord: String, onKeyEvent: (KeyEvent) -> Boolean) {
     val requester = remember { FocusRequester() }
-    Box(Modifier.onKeyEvent { keyEvent ->
-        println(keyEvent)
-        when {
-            keyEvent.key == Key.Enter -> {
-                onWordSubmitted(wordInput)
-                wordInput = ""
-            }
-            keyEvent.key == Key.Backspace && keyEvent.type == KeyEventType.KeyUp -> {
-                wordInput = wordInput.dropLast(1)
-            }
-            keyEvent.isTypedEvent -> {
-                wordInput += keyEvent.utf16CodePoint.toChar()
-            }
-        }
-        wordInput = wordInput.take(5)
-        false
-    }
+    Box(Modifier.onKeyEvent(onKeyEvent)
         .focusRequester(requester)
         .clickable { requester.requestFocus() }
     ) {
         ColoredWord(WordleWord(List(5) {
-            io.sebi.kwordle.game.WordleLetter(wordInput.getOrElse(it) { ' ' }.uppercaseChar(), INCORRECT)
+            io.sebi.kwordle.game.WordleLetter(currentWord.getOrElse(it) { ' ' }.uppercaseChar(), INCORRECT)
         }))
     }
 }
