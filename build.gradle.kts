@@ -21,7 +21,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
-    testImplementation("app.cash.turbine:turbine:0.7.0")
+    testImplementation("app.cash.turbine:turbine:0.12.1")
 }
 
 tasks.test {
