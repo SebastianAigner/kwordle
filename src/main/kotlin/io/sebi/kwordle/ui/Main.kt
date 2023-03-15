@@ -9,13 +9,13 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.isTypedEvent
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Shapes
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
@@ -29,6 +29,7 @@ import androidx.compose.ui.window.rememberWindowState
 import io.sebi.kwordle.game.Game
 import io.sebi.kwordle.game.LetterState
 import io.sebi.kwordle.game.LetterState.*
+import io.sebi.kwordle.game.WordleLetter
 import io.sebi.kwordle.game.WordleWord
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -182,16 +183,14 @@ val LetterState.textColor: Color
         }
     }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun WordleWordInput(currentWord: String, onKeyEvent: (KeyEvent) -> Boolean) {
-    val requester = remember { FocusRequester() }
-    Box(Modifier.onKeyEvent(onKeyEvent)
-        .focusRequester(requester)
-        .clickable { requester.requestFocus() }
+    Box(Modifier
+        .clickable { }
+        .onKeyEvent(onKeyEvent)
     ) {
         ColoredWord(WordleWord(List(5) {
-            io.sebi.kwordle.game.WordleLetter(currentWord.getOrElse(it) { ' ' }.uppercaseChar(), INCORRECT)
+            WordleLetter(currentWord.getOrElse(it) { ' ' }.uppercaseChar(), INCORRECT)
         }))
     }
 }
