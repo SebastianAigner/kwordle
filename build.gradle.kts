@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.8.20"
     id("org.jetbrains.compose") version "1.4.0"
-    id("org.jetbrains.kotlinx.kover") version "0.7.2"
+    id("org.jetbrains.kotlinx.kover") version "0.8.3"
 }
 
 group = "io.sebi"
