@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.9.25"
     id("org.jetbrains.compose") version "1.4.0"
     id("org.jetbrains.kotlinx.kover") version "0.7.2"
 }
